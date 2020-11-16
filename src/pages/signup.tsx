@@ -108,13 +108,13 @@ const Login: React.FC = () => {
                   type="submit"
                   isLoading={isLoading}
                 >
-                  Entrar
+                  Cadastrar
                 </Button>
 
                 {error && (
                   <Alert marginBottom={2} status="error">
                     <AlertIcon />
-                    Credenciais incorretas.
+                    Erro interno, tente novamente.
                   </Alert>
                 )}
 
