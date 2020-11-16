@@ -14,8 +14,10 @@ const CheckAuth: React.FC = ({ children }) => {
         if (window.location.pathname === '/login') {
           router.push('/dashboard')
         }
-      } catch (error) {
-        router.push('/login')
+      } catch {
+        if (window.location.pathname !== '/login') {
+          router.push('/login')
+        }
       }
     }
 

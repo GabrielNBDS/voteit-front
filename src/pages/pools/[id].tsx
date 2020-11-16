@@ -36,7 +36,7 @@ export default function Candidates({ id, title, staticCandidates }: PoolProps) {
   }, [])
 
   useEffect(() => {
-    const socket = io('http://localhost:3333')
+    const socket = io(process.env.API_URL)
 
     socket.on(id, (votedCandidate: ICandidate) => {
       const updatedCandidates = ref.current.map<ICandidate>(candidate => {
@@ -62,16 +62,14 @@ export const getServerSideProps: GetServerSideProps<PoolProps> = async context =
   const { id } = context.query
   const id_ = id.toString()
 
-  const response = await api.get(`http://localhost:3333/candidates?id=${id}`)
+  const response = await api.get(`/candidates?id=${id}`)
   const data = response.data
-
-  const { name } = data[1]
 
   return {
     props: {
       id: id_,
-      title: name,
-      staticCandidates: data[0]
+      title: data.pool.name,
+      staticCandidates: data.candidates
     }
   }
 }

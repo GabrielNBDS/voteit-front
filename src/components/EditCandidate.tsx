@@ -1,5 +1,11 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useRef, useState } from 'react'
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Box,
   Button,
   Flex,
@@ -9,18 +15,20 @@ import {
   Text,
   useToast
 } from '@chakra-ui/core'
-import { FiCamera, FiEdit, FiSave, FiX } from 'react-icons/fi'
+import { FiCamera, FiEdit, FiSave, FiTrash, FiX } from 'react-icons/fi'
 import api from '../services/api'
 
-interface ICandidate {
+interface IProps {
   id: string
   name: string
   image: string
   short_description: string
   description: string
+  deleteCandidate: (id: string) => Promise<void>
 }
 
-const EditCandidate: React.FC<ICandidate> = ({
+const EditCandidate: React.FC<IProps> = ({
+  deleteCandidate,
   id,
   description: PropDescription,
   image: PropImage,
@@ -77,7 +85,8 @@ const EditCandidate: React.FC<ICandidate> = ({
     setCanEdit(false)
   }
 
-  const handleSave = async () => {
+  const handleSave = async e => {
+    e.preventDefault()
     await api.patch(`/candidates/${id}`, {
       name,
       description,
@@ -93,6 +102,12 @@ const EditCandidate: React.FC<ICandidate> = ({
       isClosable: true
     })
   }
+
+  const [isOpen, setIsOpen] = useState(false)
+  const onClose = () => {
+    setIsOpen(false)
+  }
+  const cancelRef = useRef()
 
   return (
     <Box
@@ -164,44 +179,88 @@ const EditCandidate: React.FC<ICandidate> = ({
           />
         </InputGroup>
 
-        {!canEdit ? (
-          <Button
-            rightIcon={<FiEdit />}
-            maxWidth="max-content"
-            marginTop={4}
-            colorScheme="blue"
-            marginRight="auto"
-            variant="outline"
-            onClick={handleEdit}
-          >
-            Editar
-          </Button>
-        ) : (
-          <Flex justifyContent="flex-start" width="100%">
-            <Button
-              rightIcon={<FiSave />}
-              maxWidth="max-content"
-              marginTop={4}
-              marginRight={2}
-              colorScheme="blue"
-              type="submit"
-            >
-              Salvar
-            </Button>
-            <Button
-              rightIcon={<FiX />}
-              maxWidth="max-content"
-              marginTop={4}
-              colorScheme="blue"
-              marginRight="auto"
-              variant="ghost"
-              onClick={handleCancel}
-            >
-              Cancelar
-            </Button>
-          </Flex>
-        )}
+        <Flex marginTop={4} justifyContent="space-between">
+          {!canEdit ? (
+            <>
+              <Button
+                rightIcon={<FiEdit />}
+                colorScheme="blue"
+                variant="outline"
+                onClick={handleEdit}
+              >
+                Editar
+              </Button>
+              <Button
+                colorScheme="red"
+                rightIcon={<FiTrash />}
+                onClick={() => setIsOpen(true)}
+              >
+                Deletar
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                rightIcon={<FiSave />}
+                maxWidth="max-content"
+                marginTop={4}
+                marginRight={2}
+                colorScheme="blue"
+                type="submit"
+                disabled={
+                  name === nameBeforeEdit &&
+                  description === descriptionBeforeEdit &&
+                  shortDescription === shortDescriptionBeforeEdit
+                }
+              >
+                Salvar
+              </Button>
+              <Button
+                rightIcon={<FiX />}
+                maxWidth="max-content"
+                marginTop={4}
+                colorScheme="blue"
+                marginRight="auto"
+                variant="ghost"
+                onClick={handleCancel}
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
+        </Flex>
       </Box>
+
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Deletar candidato?
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Tem certeza? Isso não poderá ser revertido
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancelar
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={() => deleteCandidate(id)}
+                ml={3}
+              >
+                Deletar
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Box>
   )
 }

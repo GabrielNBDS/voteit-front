@@ -109,9 +109,10 @@ const Login: React.FC = () => {
 
                 <Flex width="100%" alignItems="center" justifyContent="center">
                   <Text marginRight={4}>Não possui conta?</Text>
-                  <ChakraLink>
-                    <Link href="signup">Cadastrar</Link>
-                  </ChakraLink>
+
+                  <Link href="signup">
+                    <ChakraLink>Cadastrar</ChakraLink>
+                  </Link>
                 </Flex>
               </form>
             </Stack>

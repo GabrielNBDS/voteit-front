@@ -31,9 +31,10 @@ const Login: React.FC = () => {
   const [error, setError] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const HandleSubmit = async e => {
+  const HandleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(false)
+    setIsLoading(true)
 
     try {
       await api.post('/users', { name, email, password })
@@ -41,6 +42,7 @@ const Login: React.FC = () => {
       router.push('login')
     } catch (error) {
       setError(true)
+      setIsLoading(false)
     }
   }
 
@@ -119,7 +121,9 @@ const Login: React.FC = () => {
                 <Flex width="100%" alignItems="center" justifyContent="center">
                   <Text marginRight={4}>Já possui conta?</Text>
                   <ChakraLink>
-                    <Link href="login">Login</Link>
+                    <Link href="login">
+                      <a>Login</a>
+                    </Link>
                   </ChakraLink>
                 </Flex>
               </form>

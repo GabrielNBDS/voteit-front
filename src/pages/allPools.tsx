@@ -16,7 +16,7 @@ const Pools: React.FC<PoolProps> = ({ pools }: PoolProps) => {
 }
 
 export const getServerSideProps: GetServerSideProps<PoolProps> = async () => {
-  const response = await api.get('http://localhost:3333/pools/all')
+  const response = await api.get('/pools/all')
   const data = response.data
 
   return {

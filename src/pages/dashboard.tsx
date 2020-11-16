@@ -41,7 +41,8 @@ import {
 } from 'react-icons/fi'
 
 import CheckAuth from '../components/CheckAuth'
-import EditCandidate from '../components/EditCandidate'
+import EditPoolModal from '../components/EditPoolModal'
+import PoolsList from '../components/PoolsList'
 import { useAuth } from '../hooks/auth'
 import api from '../services/api'
 
@@ -59,10 +60,7 @@ interface ICandidate {
 }
 
 interface IPoolData {
-  pool: {
-    id: string
-    name: string
-  }
+  pool: IPool
   candidates: ICandidate[]
 }
 
@@ -70,8 +68,9 @@ const Dashboard: React.FC = () => {
   const [pools, setPools] = useState<IPool[]>([])
   const [poolData, setPoolData] = useState<IPoolData>({} as IPoolData)
   const [poolName, setPoolName] = useState('')
-  const [poolToBeDeleted, setPoolToBeDeleted] = useState('')
   const [loaded, setLoaded] = useState(false)
+  const [poolToBeDeleted, setPoolToBeDeleted] = useState('')
+
   const [canCreate, setCanCreate] = useState(false)
 
   const [name, setName] = useState('')
@@ -102,7 +101,6 @@ const Dashboard: React.FC = () => {
   const toast = useToast()
   const poolNameRef = useRef(poolName)
   const cancelRef = useRef()
-  const scrollToRef = useRef<HTMLDivElement>()
 
   useEffect(() => {
     poolNameRef.current = poolName
@@ -133,8 +131,7 @@ const Dashboard: React.FC = () => {
     })
   }
 
-  const deletePool = async e => {
-    e.preventDefault()
+  const deletePool = async () => {
     await api.delete(`/pools/${poolToBeDeleted}`)
 
     setPools(pools.filter(pool => pool.id !== poolToBeDeleted))
@@ -150,10 +147,9 @@ const Dashboard: React.FC = () => {
   }
 
   const editPool = async (id: string) => {
-    setPoolData({} as IPoolData)
-    const { data } = await api.get(`/candidates?id=${id}`)
-    setPoolData(data)
-
+    // setPoolData({} as IPoolData)
+    // const { data } = await api.get(`/candidates?id=${id}`)
+    // setPoolData(data)
     EditModalOnOpen()
   }
 
@@ -215,6 +211,14 @@ const Dashboard: React.FC = () => {
     }
   }
 
+  const changePoolName = async (id: string, name: string) => {
+    const { data } = await api.post<IPool>(`/pools/${id}`, { name })
+
+    const newPools = pools.map(pool => (pool.id === id ? data : pool))
+
+    setPools(newPools)
+  }
+
   return (
     <CheckAuth>
       <Flex flexDir="column" paddingY={8} paddingX={4}>
@@ -227,46 +231,58 @@ const Dashboard: React.FC = () => {
           pools.length > 0 ? (
             <List spacing={3}>
               {pools.map(pool => (
-                <Box
-                  width={300}
-                  borderRadius="md"
-                  padding={4}
-                  display="flex"
-                  alignItems="center"
-                  borderWidth={1}
+                <PoolsList
                   key={pool.id}
-                >
-                  <Text marginRight="auto">{pool.name}</Text>
+                  id={pool.id}
+                  name={pool.name}
+                  setPoolToBeDeleted={setPoolToBeDeleted}
+                  AlertOnOpen={AlertOnOpen}
+                />
+                // <Box
+                //   width={300}
+                //   borderRadius="md"
+                //   padding={4}
+                //   display="flex"
+                //   alignItems="center"
+                //   borderWidth={1}
+                //   key={pool.id}
+                // >
+                //   <Text marginRight="auto">{pool.name}</Text>
 
-                  <Menu>
-                    <MenuButton colorScheme="blue" as={Button}>
-                      <FiChevronDown />
-                    </MenuButton>
-                    <MenuList>
-                      <MenuItem
-                        minH="48px"
-                        display="flex"
-                        alignItems="center"
-                        onClick={() => editPool(pool.id)}
-                      >
-                        <Text>Editar pool</Text>
-                        <Icon as={FiEdit} marginLeft="auto" />
-                      </MenuItem>
-                      <MenuItem
-                        minH="40px"
-                        display="flex"
-                        alignItems="center"
-                        onClick={() => {
-                          setPoolToBeDeleted(pool.id)
-                          AlertOnOpen()
-                        }}
-                      >
-                        <Text>Deletar Pool</Text>
-                        <Icon as={FiTrash} marginLeft="auto" />
-                      </MenuItem>
-                    </MenuList>
-                  </Menu>
-                </Box>
+                //   <Menu>
+                //     <MenuButton colorScheme="blue" as={Button}>
+                //       <FiChevronDown />
+                //     </MenuButton>
+                //     <MenuList>
+                //       <MenuItem
+                //         minH="48px"
+                //         display="flex"
+                //         alignItems="center"
+                //         onClick={EditModalOnOpen}
+                //       >
+                //         <Text>Editar pool</Text>
+                //         <Icon as={FiEdit} marginLeft="auto" />
+                //       </MenuItem>
+                //       <MenuItem
+                //         minH="40px"
+                //         display="flex"
+                //         alignItems="center"
+                //         onClick={() => {
+                //           setPoolToBeDeleted(pool.id)
+                //           AlertOnOpen()
+                //         }}
+                //       >
+                //         <Text>Deletar Pool</Text>
+                //         <Icon as={FiTrash} marginLeft="auto" />
+                //       </MenuItem>
+                //     </MenuList>
+                //   </Menu>
+                //   <EditPoolModal
+                //     id={pool.id}
+                //     isOpen={EditModalIsOpen}
+                //     onClose={EditModalOnClose}
+                //   />
+                // </Box>
               ))}
             </List>
           ) : (
@@ -316,7 +332,7 @@ const Dashboard: React.FC = () => {
         </ModalContent>
       </Modal>
 
-      <Modal isOpen={EditModalIsOpen} onClose={EditModalOnClose}>
+      {/* <Modal isOpen={EditModalIsOpen} onClose={EditModalOnClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Editar pool</ModalHeader>
@@ -449,7 +465,7 @@ const Dashboard: React.FC = () => {
             <div ref={scrollToRef}></div>
           </ModalBody>
         </ModalContent>
-      </Modal>
+      </Modal> */}
 
       <AlertDialog
         isOpen={AlertIsOpen}
