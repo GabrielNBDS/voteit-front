@@ -73,7 +73,7 @@ const EditPoolModal: React.FC<IProps> = ({ isOpen, onClose, id }) => {
     }
 
     getData()
-  }, [poolData])
+  }, [])
 
   const handleAddimage = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
