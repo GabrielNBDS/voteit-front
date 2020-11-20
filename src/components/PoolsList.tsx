@@ -9,6 +9,7 @@ import {
   Text,
   useDisclosure
 } from '@chakra-ui/core'
+import { useRouter } from 'next/router'
 import React from 'react'
 import { FiChevronDown, FiEdit, FiTrash } from 'react-icons/fi'
 import EditPoolModal from './EditPoolModal'
@@ -26,7 +27,9 @@ const PoolsList: React.FC<Iprops> = ({
   AlertOnOpen,
   setPoolToBeDeleted
 }) => {
+  const router = useRouter()
   const { isOpen, onOpen, onClose } = useDisclosure()
+
   return (
     <Box
       width={300}
@@ -48,7 +51,7 @@ const PoolsList: React.FC<Iprops> = ({
             minH="48px"
             display="flex"
             alignItems="center"
-            onClick={onOpen}
+            onClick={() => router.push(`/details/${id}`)}
           >
             <Text>Editar pool</Text>
             <Icon as={FiEdit} marginLeft="auto" />
@@ -67,7 +70,6 @@ const PoolsList: React.FC<Iprops> = ({
           </MenuItem>
         </MenuList>
       </Menu>
-      <EditPoolModal id={id} isOpen={isOpen} onClose={onClose} />
     </Box>
   )
 }

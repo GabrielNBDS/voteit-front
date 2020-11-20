@@ -114,7 +114,6 @@ const EditCandidate: React.FC<IProps> = ({
       borderWidth="1px"
       borderRadius="xl"
       padding={4}
-      marginBottom={4}
       display="flex"
       flexDir="column"
       alignItems="center"

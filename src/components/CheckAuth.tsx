@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
+import Cookies from 'js-cookie'
 
 import api from '../services/api'
 
@@ -9,13 +10,17 @@ const CheckAuth: React.FC = ({ children }) => {
   useEffect(() => {
     async function checkAuth() {
       try {
-        await api.get('/sessions/auth')
+        const token = Cookies.get('@voteit:token')
 
-        if (window.location.pathname === '/login') {
+        if (window.location.pathname === '/login' && token) {
           router.push('/dashboard')
+          return
         }
+
+        await api.get('/sessions/auth')
       } catch {
         if (window.location.pathname !== '/login') {
+          Cookies.remove('@voteit:token')
           router.push('/login')
         }
       }
