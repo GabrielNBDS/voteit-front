@@ -17,6 +17,7 @@ import EditCandidate from '../../components/EditCandidate'
 import { FiArrowLeft, FiCamera, FiPlus, FiSave, FiX } from 'react-icons/fi'
 import Link from 'next/link'
 import { GetServerSideProps } from 'next'
+import io from 'socket.io-client'
 
 interface IPool {
   id: string
