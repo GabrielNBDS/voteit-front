@@ -16,6 +16,7 @@ import { useRouter } from 'next/router'
 import EditCandidate from '../../components/EditCandidate'
 import { FiArrowLeft, FiCamera, FiPlus, FiSave, FiX } from 'react-icons/fi'
 import Link from 'next/link'
+import { GetServerSideProps } from 'next'
 
 interface IPool {
   id: string
@@ -24,6 +25,7 @@ interface IPool {
 
 interface ICandidate {
   id: string
+  votes: number
   name: string
   image: string
   short_description: string
@@ -35,10 +37,11 @@ interface IPoolData {
   candidates: ICandidate[]
 }
 
-const Details: React.FC = () => {
-  const router = useRouter()
-  const { id } = router.query
+interface IProps {
+  id: string
+}
 
+const Details: React.FC<IProps> = ({ id }: IProps) => {
   const toast = useToast()
   const [poolData, setPoolData] = useState<IPoolData>({} as IPoolData)
 
@@ -55,6 +58,12 @@ const Details: React.FC = () => {
 
   const scrollToRef = useRef<HTMLDivElement>()
 
+  const ref = useRef(poolData.candidates)
+
+  useEffect(() => {
+    ref.current = poolData.candidates
+  }, [poolData.candidates])
+
   useEffect(() => {
     async function getData() {
       const { data } = await api.get(`/candidates?id=${id}`)
@@ -64,6 +73,20 @@ const Details: React.FC = () => {
     }
 
     getData()
+
+    const socket = io(process.env.API_URL)
+
+    socket.on(id, (votedCandidate: ICandidate) => {
+      const updatedCandidates = ref.current.map<ICandidate>(candidate => {
+        if (candidate.id === votedCandidate.id) {
+          return votedCandidate
+        } else {
+          return candidate
+        }
+      })
+
+      setPoolData({ pool: poolData.pool, candidates: updatedCandidates })
+    })
   }, [])
 
   const handleAddimage = (e: ChangeEvent<HTMLInputElement>) => {
@@ -329,3 +352,14 @@ const Details: React.FC = () => {
 }
 
 export default Details
+
+export const getServerSideProps: GetServerSideProps<IProps> = async context => {
+  const { id } = context.query
+  const id_ = id.toString()
+
+  return {
+    props: {
+      id: id_
+    }
+  }
+}
