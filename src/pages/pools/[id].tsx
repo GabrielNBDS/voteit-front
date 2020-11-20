@@ -35,7 +35,7 @@ export default function Candidates({ id, title, staticCandidates }: PoolProps) {
   }, [])
 
   useEffect(() => {
-    const socket = io(process.env.REACT_APP_API_URL)
+    const socket = io(process.env.NEXT_PUBLIC_API_URL)
 
     socket.on(id, (votedCandidate: ICandidate) => {
       const updatedCandidates = ref.current.map<ICandidate>(candidate => {
