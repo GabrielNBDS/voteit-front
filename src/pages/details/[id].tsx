@@ -74,7 +74,7 @@ const Details: React.FC<IProps> = ({ id }: IProps) => {
 
     getData()
 
-    const socket = io(process.env.API_URL)
+    const socket = io(process.env.REACT_APP_API_URL)
 
     socket.on(id, (votedCandidate: ICandidate) => {
       const updatedCandidates = ref.current.map<ICandidate>(candidate => {
