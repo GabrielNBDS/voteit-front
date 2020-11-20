@@ -12,7 +12,6 @@ interface ICandidate {
   name: string
   votes: number
   image: string
-  // eslint-disable-next-line camelcase
   short_description: string
   description: string
 }
@@ -36,7 +35,7 @@ export default function Candidates({ id, title, staticCandidates }: PoolProps) {
   }, [])
 
   useEffect(() => {
-    const socket = io(process.env.API_URL)
+    const socket = io(process.env.REACT_APP_API_URL)
 
     socket.on(id, (votedCandidate: ICandidate) => {
       const updatedCandidates = ref.current.map<ICandidate>(candidate => {
