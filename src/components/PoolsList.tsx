@@ -7,12 +7,12 @@ import {
   MenuItem,
   MenuList,
   Text,
-  useDisclosure
+  Link as ChakraLink
 } from '@chakra-ui/core'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { FiChevronDown, FiEdit, FiTrash } from 'react-icons/fi'
-import EditPoolModal from './EditPoolModal'
 
 interface Iprops {
   id: string
@@ -28,7 +28,6 @@ const PoolsList: React.FC<Iprops> = ({
   setPoolToBeDeleted
 }) => {
   const router = useRouter()
-  const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
     <Box
@@ -40,7 +39,11 @@ const PoolsList: React.FC<Iprops> = ({
       borderWidth={1}
       key={id}
     >
-      <Text marginRight="auto">{name}</Text>
+      <ChakraLink marginRight="auto">
+        <Link href={`/pools/${id}`}>
+          <Text>{name}</Text>
+        </Link>
+      </ChakraLink>
 
       <Menu>
         <MenuButton colorScheme="blue" as={Button}>
