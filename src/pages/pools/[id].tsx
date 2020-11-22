@@ -5,7 +5,7 @@ import api from '../../services/api'
 import io from 'socket.io-client'
 
 import Layout from '../../components/Layout'
-import { Flex } from '@chakra-ui/core'
+import { Box, Button, Grid, Heading, Image, Text } from '@chakra-ui/core'
 
 interface ICandidate {
   id: string
@@ -22,7 +22,11 @@ interface PoolProps {
   staticCandidates: ICandidate[]
 }
 
-export default function Candidates({ id, title, staticCandidates }: PoolProps) {
+const Candidates: React.FC<PoolProps> = ({
+  id,
+  title,
+  staticCandidates
+}: PoolProps) => {
   const [candidates, setCandidates] = useState<ICandidate[]>(staticCandidates)
   const ref = useRef(candidates)
 
@@ -45,14 +49,57 @@ export default function Candidates({ id, title, staticCandidates }: PoolProps) {
           return candidate
         }
       })
-
       setCandidates(updatedCandidates)
     })
   }, [])
 
   return (
     <Layout title={`${title} | voteit`}>
-      <Flex>teste</Flex>
+      <Box
+        as="header"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        paddingY={12}
+      >
+        <Heading as="h1">{title}</Heading>
+      </Box>
+      <Grid
+        gap={4}
+        paddingY={4}
+        templateColumns="repeat(auto-fit, minmax(320px, 1fr))"
+      >
+        {candidates.map(candidate => (
+          <Box
+            key={candidate.id}
+            padding={4}
+            display="flex"
+            flexDir="column"
+            alignItems="center"
+          >
+            <Box>
+              <Image
+                width="215px"
+                height="215px"
+                borderRadius="full"
+                src={candidate.image}
+              />
+            </Box>
+            <Box textAlign="center">
+              <Text fontWeight="700" fontSize={20} marginY={2}>
+                {candidate.name}
+              </Text>
+              <Text marginBottom={2}>{candidate.short_description}</Text>
+              <Text marginBottom={2} fontWeight="500">
+                {candidate.votes} votos
+              </Text>
+              <Button onClick={() => vote(candidate.id)} colorScheme="blue">
+                Votar
+              </Button>
+            </Box>
+          </Box>
+        ))}
+      </Grid>
     </Layout>
   )
 }
@@ -72,3 +119,5 @@ export const getServerSideProps: GetServerSideProps<PoolProps> = async context =
     }
   }
 }
+
+export default Candidates
